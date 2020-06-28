@@ -5,9 +5,12 @@
 package it.polito.tdp.newufosightings;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.newufosightings.model.Model;
+import it.polito.tdp.newufosightings.model.StatoLivello;
+import it.polito.tdp.newufosightings.model.StatoNumero;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -51,17 +54,113 @@ public class NewUfoSightingsController {
 
 	@FXML
 	void doCreaGrafo(ActionEvent event) {
-
+		this.txtResult.clear();
+		String shape = this.cmbBoxForma.getValue();
+		if(shape==null) {
+			txtResult.appendText("Scegliere una forma dal menu a tendina!\n");
+			return;
+		}
+		
+		Integer anno = 0;
+		try {
+			anno = Integer.parseInt(this.txtAnno.getText());
+		} catch (NumberFormatException e) {
+			this.txtResult.appendText("Inserire un numero intero!\n");
+			return;
+		}
+		
+		if(anno<1910 || anno>2014) {
+			this.txtResult.appendText("Inserire un numero compreso tra 1010 e 2014!\n");
+			return;
+		}
+		
+		this.model.generateGraph(shape, anno);
+		this.txtResult.appendText("Il grafo è stato creato!\n");
+		this.txtResult.appendText("Il numero di vertici del grafo è: "+this.model.getNumVertici()+"\n");
+		this.txtResult.appendText("Il numero di archi del grafo è: "+this.model.getNumArchi()+"\n\n");
+		this.txtResult.appendText("La somma dei pesi degli archi adiacenti per ogni stato è:\n");
+		
+		List<StatoNumero> statoNumero = this.model.getStatoNum();
+		for(StatoNumero sn : statoNumero) {
+			this.txtResult.appendText(sn.toString()+"\n");
+		}
+		
+		this.btnSimula.setDisable(false);
 	}
 
 	@FXML
 	void doSelezionaAnno(ActionEvent event) {
-
+		this.txtResult.clear();
+		
+		Integer anno = 0;
+		try {
+			anno = Integer.parseInt(this.txtAnno.getText());
+		} catch (NumberFormatException e) {
+			this.txtResult.appendText("Inserire un numero intero!\n");
+			return;
+		}
+		
+		if(anno<1910 || anno>2014) {
+			this.txtResult.appendText("Inserire un numero compreso tra 1010 e 2014!\n");
+			return;
+		}
+		
+		this.cmbBoxForma.getItems().setAll(this.model.getShapes(anno));
+		this.btnCreaGrafo.setDisable(false);
 	}
 
 	@FXML
 	void doSimula(ActionEvent event) {
-
+		this.txtResult.clear();
+		
+		Integer numGiorni = 0;
+		try {
+			numGiorni = Integer.parseInt(this.txtT1.getText());
+		} catch (NumberFormatException e) {
+			this.txtResult.appendText("Inserire un numero intero!\n");
+			return;
+		}
+		
+		if(numGiorni>365 || numGiorni<1) {
+			this.txtResult.appendText("Inserire un numero di giorni maggiori di 0 e minori di 365!\n");
+			return;
+		}
+		
+		Integer alfa = 0;
+		try {
+			alfa = Integer.parseInt(this.txtAlfa.getText());
+		} catch (NumberFormatException e) {
+			this.txtResult.appendText("Inserire un numero intero!\n");
+			return;
+		}
+		
+		if(alfa<0 || alfa>100) {
+			this.txtResult.appendText("Inserire un numero compreso tra 0 e 100!\n");
+			return;
+		}
+		
+		String shape = this.cmbBoxForma.getValue();
+		if(shape==null) {
+			txtResult.appendText("Scegliere una forma dal menu a tendina!\n");
+			return;
+		}
+		
+		Integer anno = 0;
+		try {
+			anno = Integer.parseInt(this.txtAnno.getText());
+		} catch (NumberFormatException e) {
+			this.txtResult.appendText("Inserire un numero intero!\n");
+			return;
+		}
+		
+		this.model.simula(numGiorni, alfa, anno, shape);
+		
+		this.txtResult.appendText("I diversi livelli di allerta per i vari stati sono:\n");
+		
+		List<StatoLivello> livelli = this.model.getLivelloAllerta();
+		for(StatoLivello s : livelli) {
+			this.txtResult.appendText(s.toString()+"\n");
+		}
 	}
 
 	@FXML // This method is called by the FXMLLoader when initialization is complete
@@ -79,6 +178,7 @@ public class NewUfoSightingsController {
 
 	public void setModel(Model model) {
 		this.model = model;
-
+		this.btnCreaGrafo.setDisable(true);
+		this.btnSimula.setDisable(true);
 	}
 }

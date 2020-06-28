@@ -4,9 +4,9 @@ public class TestDAO {
 
 	public static void main(String[] args) {
 
-		NewUfoSightingsDAO dao = new NewUfoSightingsDAO();
+		//NewUfoSightingsDAO dao = new NewUfoSightingsDAO();
 
-		System.out.println(dao.loadAllStates());
+		//System.out.println(dao.loadAllStates());
 	}
 
 }
